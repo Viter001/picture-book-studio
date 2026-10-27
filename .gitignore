@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.agent/runs/
+.graphflow/
+.graphflow-cache/
+graphflow-out/
+.DS_Store
+Thumbs.db
