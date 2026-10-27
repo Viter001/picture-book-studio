@@ -22,3 +22,4 @@
 - [验收记录](docs/acceptance.md)
 - [产品讨论草稿](docs/product-discussion-draft.md)
 - [MVP 产品规划（待讨论）](docs/product-plan-mvp.md)
+- [技术路线与参考项目调研（待讨论）](docs/technical-route-research.md)
