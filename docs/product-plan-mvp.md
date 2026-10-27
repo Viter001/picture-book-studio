@@ -90,6 +90,6 @@
 
 ## 9. 资料入口
 
-[全局规划](product-roadmap.md) · [技术调研](technical-route-research.md) · [视觉讨论](frontend-backend-visual.md) · [产物规范](artifact-standard-draft.md) · [决策记录](../QUESTIONS.md)
+[全局规划](product-roadmap.md) · [技术路线](product-roadmap.md#technology) · [工作区与视觉](product-roadmap.md#workspace) · [作品规范](product-roadmap.md#artifacts) · [决策记录](../QUESTIONS.md)
 
 历史 v0.1—v0.5 保存在 Git 历史；本次是文档职责重组和范围纠正，不是功能完成或默认批准。
