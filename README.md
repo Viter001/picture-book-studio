@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-2026-10-27：建立独立项目与本地 Git 仓库，完成项目管理文档初始化。已确认 Electron + React + 自有绘本模型路线，规划书升级至 v0.5。尚未实现软件功能；首版细项、前后端边界、视觉设计及原项目复用范围继续讨论。
+2026-10-27：建立独立项目与本地 Git 仓库，完成项目管理文档初始化。已确认 Electron + React + 自有绘本模型路线，规划已拆为全局设计与发展规划 v0.1、MVP 规划 v0.6；长期方向不自动进入首版。尚未实现软件功能；首版细项、前后端边界、视觉设计及原项目复用范围继续讨论。
 
 ## 来源与边界
 
@@ -21,7 +21,8 @@
 - [开发记录](DEVLOG.md)
 - [验收记录](docs/acceptance.md)
 - [产品讨论草稿](docs/product-discussion-draft.md)
-- [MVP 产品规划（待讨论）](docs/product-plan-mvp.md)
+- [产品全局设计与发展规划](docs/product-roadmap.md)
+- [MVP 版本规划（范围待冻结）](docs/product-plan-mvp.md)
 - [技术路线与参考项目调研（待讨论）](docs/technical-route-research.md)
 
 - [前后端与视觉参考讨论稿](docs/frontend-backend-visual.md)
