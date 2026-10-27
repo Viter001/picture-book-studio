@@ -21,3 +21,4 @@
 - [开发记录](DEVLOG.md)
 - [验收记录](docs/acceptance.md)
 - [产品讨论草稿](docs/product-discussion-draft.md)
+- [MVP 产品规划（待讨论）](docs/product-plan-mvp.md)
