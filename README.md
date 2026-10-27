@@ -20,3 +20,4 @@
 - [反馈与整改](FEEDBACK.md)
 - [开发记录](DEVLOG.md)
 - [验收记录](docs/acceptance.md)
+- [产品讨论草稿](docs/product-discussion-draft.md)
