@@ -1,0 +1,379 @@
+{
+  "schemaVersion": 1,
+  "id": "2050140b-6c57-4451-8fec-d26433191d73",
+  "name": "林间来信 · 分支示例",
+  "revision": 34,
+  "width": 1280,
+  "height": 720,
+  "startPageId": "f3e4d4bb-0447-4235-aad1-c40543ccd248",
+  "pages": [
+    {
+      "id": "f3e4d4bb-0447-4235-aad1-c40543ccd248",
+      "name": "林间来信",
+      "position": {
+        "x": 60,
+        "y": 180
+      },
+      "layers": [
+        {
+          "id": "b7c0d5c9-ac7f-4aa0-8944-191377b232a0",
+          "name": "森林插画 1",
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "visible": true,
+          "assetId": "d2fefa86-d8f2-4999-8098-035cf4995305",
+          "fontSize": 40,
+          "color": "#283b35",
+          "align": "left",
+          "effect": {
+            "type": "none",
+            "duration": 0.5
+          }
+        },
+        {
+          "id": "b1cd6fc6-0e46-40dd-b389-a0dcaa3ceab7",
+          "name": "故事文字",
+          "type": "text",
+          "x": 260,
+          "y": 250,
+          "width": 760,
+          "height": 180,
+          "visible": true,
+          "text": "一封未署名的信，\n把你带到了森林边缘。",
+          "fontSize": 42,
+          "color": "#2c5344",
+          "align": "left",
+          "effect": {
+            "type": "fade",
+            "duration": 0.6
+          }
+        }
+      ],
+      "exits": [
+        {
+          "id": "ea000105-1dbd-4e53-a0f2-465f4429b648",
+          "label": "展开信笺",
+          "target": "bb87f517-7928-46cb-9f6f-d403d66dcc90"
+        }
+      ],
+      "music": {
+        "assetId": "ecc8ddcc-3855-48c9-bd12-669909da48f0",
+        "volume": 0.25
+      },
+      "voice": {
+        "assetId": "70df51c9-283a-471a-b364-73ca098a5772",
+        "volume": 0.25
+      },
+      "transition": {
+        "type": "fade",
+        "duration": 0.4
+      },
+      "background": "#faf8f2"
+    },
+    {
+      "id": "bb87f517-7928-46cb-9f6f-d403d66dcc90",
+      "name": "岔路口",
+      "position": {
+        "x": 410,
+        "y": 180
+      },
+      "layers": [
+        {
+          "id": "d0c4677d-0d1e-470d-b45e-f4c3f92ae1b6",
+          "name": "森林插画 2",
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "visible": true,
+          "assetId": "6625cfba-5e61-4270-9b4a-51bef3f6e1cf",
+          "fontSize": 40,
+          "color": "#283b35",
+          "align": "left",
+          "effect": {
+            "type": "none",
+            "duration": 0.5
+          }
+        },
+        {
+          "id": "db4d50d7-a7d1-41ba-bf86-dc7525d95de6",
+          "name": "故事文字",
+          "type": "text",
+          "x": 260,
+          "y": 250,
+          "width": 760,
+          "height": 180,
+          "visible": true,
+          "text": "风吹向两条不同的小径。\n你想先去哪里？",
+          "fontSize": 42,
+          "color": "#2c5344",
+          "align": "left",
+          "effect": {
+            "type": "fade",
+            "duration": 0.6
+          }
+        }
+      ],
+      "exits": [
+        {
+          "id": "68ad6926-9662-400f-acad-f2986ec1c11a",
+          "label": "追随萤火",
+          "target": "dbda8ea7-0a55-4116-8c34-7d4c5c0a40f1"
+        },
+        {
+          "id": "e48cc7f4-47ac-411a-8d72-03280bb433ba",
+          "label": "走向山谷",
+          "target": "bc8b280c-9db3-4c9e-bec0-d878ddd1c0c6"
+        }
+      ],
+      "music": null,
+      "voice": null,
+      "transition": {
+        "type": "fade",
+        "duration": 0.4
+      },
+      "background": "#faf8f2"
+    },
+    {
+      "id": "dbda8ea7-0a55-4116-8c34-7d4c5c0a40f1",
+      "name": "追随萤火",
+      "position": {
+        "x": 780,
+        "y": 0
+      },
+      "layers": [
+        {
+          "id": "a0892db2-a779-439d-9cfb-0f920cd4e927",
+          "name": "森林插画 3",
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "visible": true,
+          "assetId": "4855b758-3adb-4200-a054-9bdb0047e30a",
+          "fontSize": 40,
+          "color": "#283b35",
+          "align": "left",
+          "effect": {
+            "type": "none",
+            "duration": 0.5
+          }
+        },
+        {
+          "id": "4f2ae267-595d-489b-8ec7-f151a8a6a904",
+          "name": "故事文字",
+          "type": "text",
+          "x": 260,
+          "y": 250,
+          "width": 760,
+          "height": 180,
+          "visible": true,
+          "text": "萤火绕了一圈，\n又带你回到熟悉的岔路口。",
+          "fontSize": 42,
+          "color": "#2c5344",
+          "align": "left",
+          "effect": {
+            "type": "fade",
+            "duration": 0.6
+          }
+        }
+      ],
+      "exits": [
+        {
+          "id": "717e019d-8f1d-4c61-877b-e53451b5a277",
+          "label": "回到岔路口",
+          "target": "bb87f517-7928-46cb-9f6f-d403d66dcc90"
+        }
+      ],
+      "music": null,
+      "voice": null,
+      "transition": {
+        "type": "fade",
+        "duration": 0.4
+      },
+      "background": "#faf8f2"
+    },
+    {
+      "id": "bc8b280c-9db3-4c9e-bec0-d878ddd1c0c6",
+      "name": "走向山谷",
+      "position": {
+        "x": 780,
+        "y": 380
+      },
+      "layers": [
+        {
+          "id": "b84b1cc2-7a1f-4d38-a8cc-2cea42ca848d",
+          "name": "森林插画 4",
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "visible": true,
+          "assetId": "57057bb8-c64b-4baa-9f63-36183b6d45eb",
+          "fontSize": 40,
+          "color": "#283b35",
+          "align": "left",
+          "effect": {
+            "type": "none",
+            "duration": 0.5
+          }
+        },
+        {
+          "id": "dad030e2-ca97-4f59-9d13-e5dfdfeb1488",
+          "name": "故事文字",
+          "type": "text",
+          "x": 260,
+          "y": 250,
+          "width": 760,
+          "height": 180,
+          "visible": true,
+          "text": "沿着山谷前行，\n远方的灯火渐渐清晰。",
+          "fontSize": 42,
+          "color": "#2c5344",
+          "align": "left",
+          "effect": {
+            "type": "fade",
+            "duration": 0.6
+          }
+        }
+      ],
+      "exits": [
+        {
+          "id": "67d55ca5-0015-4909-ac7b-f062c90d5989",
+          "label": "继续前行",
+          "target": "64fcc0f8-ec8f-4ab7-957e-670ed736e3f9"
+        }
+      ],
+      "music": null,
+      "voice": null,
+      "transition": {
+        "type": "fade",
+        "duration": 0.4
+      },
+      "background": "#faf8f2"
+    },
+    {
+      "id": "64fcc0f8-ec8f-4ab7-957e-670ed736e3f9",
+      "name": "新的旅程",
+      "position": {
+        "x": 1150,
+        "y": 380
+      },
+      "layers": [
+        {
+          "id": "171e069a-ad11-44c1-91b9-508a18c79b46",
+          "name": "森林插画 5",
+          "type": "image",
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "visible": true,
+          "assetId": "6fa15f33-c7fe-47a7-bac6-61758a8faab6",
+          "fontSize": 40,
+          "color": "#283b35",
+          "align": "left",
+          "effect": {
+            "type": "none",
+            "duration": 0.5
+          }
+        },
+        {
+          "id": "14f7130c-a6f2-4916-93e8-0ba4062e4976",
+          "name": "故事文字",
+          "type": "text",
+          "x": 260,
+          "y": 250,
+          "width": 760,
+          "height": 180,
+          "visible": true,
+          "text": "故事在此停留，\n而你的旅程才刚刚开始。",
+          "fontSize": 42,
+          "color": "#2c5344",
+          "align": "left",
+          "effect": {
+            "type": "fade",
+            "duration": 0.6
+          }
+        }
+      ],
+      "exits": [],
+      "music": null,
+      "voice": null,
+      "transition": {
+        "type": "fade",
+        "duration": 0.4
+      },
+      "background": "#faf8f2"
+    }
+  ],
+  "assets": [
+    {
+      "id": "d2fefa86-d8f2-4999-8098-035cf4995305",
+      "name": "森林插画 1",
+      "kind": "image",
+      "path": "assets/d2fefa86-d8f2-4999-8098-035cf4995305.png",
+      "mime": "image/png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "id": "6625cfba-5e61-4270-9b4a-51bef3f6e1cf",
+      "name": "森林插画 2",
+      "kind": "image",
+      "path": "assets/6625cfba-5e61-4270-9b4a-51bef3f6e1cf.png",
+      "mime": "image/png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "id": "4855b758-3adb-4200-a054-9bdb0047e30a",
+      "name": "森林插画 3",
+      "kind": "image",
+      "path": "assets/4855b758-3adb-4200-a054-9bdb0047e30a.png",
+      "mime": "image/png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "id": "57057bb8-c64b-4baa-9f63-36183b6d45eb",
+      "name": "森林插画 4",
+      "kind": "image",
+      "path": "assets/57057bb8-c64b-4baa-9f63-36183b6d45eb.png",
+      "mime": "image/png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "id": "6fa15f33-c7fe-47a7-bac6-61758a8faab6",
+      "name": "森林插画 5",
+      "kind": "image",
+      "path": "assets/6fa15f33-c7fe-47a7-bac6-61758a8faab6.png",
+      "mime": "image/png",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "id": "ecc8ddcc-3855-48c9-bd12-669909da48f0",
+      "name": "背景示例音",
+      "kind": "audio",
+      "path": "assets/ecc8ddcc-3855-48c9-bd12-669909da48f0.wav",
+      "mime": "audio/wav",
+      "duration": 2
+    },
+    {
+      "id": "70df51c9-283a-471a-b364-73ca098a5772",
+      "name": "配音通道示例音",
+      "kind": "audio",
+      "path": "assets/70df51c9-283a-471a-b364-73ca098a5772.wav",
+      "mime": "audio/wav",
+      "duration": 2
+    }
+  ]
+}

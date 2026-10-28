@@ -12,3 +12,6 @@ coverage/
 graphflow-out/
 .DS_Store
 Thumbs.db
+
+dist-electron/
+release/

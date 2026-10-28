@@ -1,0 +1,41 @@
+{
+  "name": "picture-book-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "node scripts/build-app.mjs",
+    "start": "electron .",
+    "dev": "npm run build && electron .",
+    "package": "npm run build && node scripts/package.mjs",
+    "test:electron": "node scripts/smoke.mjs",
+    "sample": "tsx scripts/create-sample.ts",
+    "test:integration": "node scripts/integration.mjs",
+    "test:agent": "node scripts/agent-host.mjs",
+    "format:check": "prettier --check src tests scripts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@xyflow/react": "12.12.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "electron": "45.1.0",
+    "esbuild": "^0.28.2",
+    "ffmpeg-static": "^5.3.0",
+    "playwright": "^1.58.0",
+    "prettier": "^3.8.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}
