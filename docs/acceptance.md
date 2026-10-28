@@ -1,6 +1,15 @@
 # 验收记录
 
-## 2026-10-28：0.1.0 开发预览验收（当前）
+## 2026-10-29：FB-001 默认启动复验（当前补充）
+
+- 用户实测工作区 EXE 无窗口，管理员与关闭 GPU 均未解决。23:31 的本应用 Windows 转储报告 GPU 进程不可用；后续最小原生探针定位到窗口站创建失败（沙箱返回码 12）。
+- 查验 EXE 的继承完整性标签为 Low，进程完整性 RID=4096。工作区外的新副本不含该低完整性标签；相同 Electron 45.1.0 和应用代码在 `E:/PictureBookStudio-preview` 默认启动成功。Electron 44 对照仍在原目录失败，因此没有降级依赖。
+- 使用 `STUDIO_EXECUTABLE=E:/PictureBookStudio-preview/PictureBookStudio.exe`，清除 `STUDIO_TEST_NO_SANDBOX` 后运行 `node scripts/smoke.mjs`：编辑、撤销、分支、回连、结尾与三档缩放通过，退出码 0；原生截图已核对。没有修改系统/工作区 ACL，没有启用 no-sandbox、disable-gpu。
+- 打包交付改为 ZIP：解压到普通应用目录后启动；同包自动附带示例、说明和示例启动入口。旧目录中的直接 EXE 不再作为推荐启动入口。
+- 用户桌面新入口试用和真实系统 DPI 体验仍待反馈；此记录不将此前受控测试改写为历史默认启动已通过。
+- 依据：[Windows 完整性与进程创建](https://learn.microsoft.com/en-us/windows/win32/secauthz/mandatory-integrity-control)、[Chromium 沙箱初始化](https://raw.githubusercontent.com/chromium/chromium/main/sandbox/policy/sandbox.cc)。详细诊断记录位于 `.agent/runs/startup/`，不提交原始转储。
+
+## 2026-10-28：0.1.0 开发预览验收（历史基线）
 
 当前交付是可试用的开发预览版，不声明 v0.7 的 A1—A10 已全部完成正式验收。源码、五页自有示例、Windows x64 应用目录及接入说明均已落地。
 

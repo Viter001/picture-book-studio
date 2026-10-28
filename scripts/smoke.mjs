@@ -34,6 +34,26 @@ try {
     await new Promise((r) => setTimeout(r, 100));
   }
   assert.ok(page, 'main window loaded');
+  const isolation = await app.evaluate(({ app, BrowserWindow }) => ({
+    noSandbox: app.commandLine.hasSwitch('no-sandbox'),
+    windows: BrowserWindow.getAllWindows().map((window) => {
+      const prefs = window.webContents.getLastWebPreferences();
+      return {
+        sandbox: prefs.sandbox,
+        contextIsolation: prefs.contextIsolation,
+        nodeIntegration: prefs.nodeIntegration,
+      };
+    }),
+  }));
+  if (process.env.STUDIO_TEST_NO_SANDBOX !== '1') {
+    assert.equal(isolation.noSandbox, false, 'default launch must retain the Chromium sandbox');
+  }
+  for (const prefs of isolation.windows) {
+    assert.equal(prefs.sandbox, true);
+    assert.equal(prefs.contextIsolation, true);
+    assert.equal(prefs.nodeIntegration, false);
+  }
+  console.log('Launch isolation', JSON.stringify(isolation));
   await page.getByText('流程工作区', { exact: true }).waitFor();
   await page.screenshot({ path: '.agent/runs/mvp/evidence/flow.png' });
   for (const zoom of [1, 1.25, 1.5]) {
