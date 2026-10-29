@@ -25,6 +25,32 @@
 
 Codex 可用单次 `-c` 覆盖临时配置，不必修改全局配置；实际验收使用此方法。参见 [官方 CLI 文档](https://developers.openai.com/codex/cli/reference/)。可执行验证见 `scripts/agent-host.mjs`，仅针对脚本创建的一次性工程。
 
+<a id="dsh"></a>
+## DSH 接入准备
+
+2026-10-29 用户询问安装方式，已提供以下步骤。**目前仅为配置说明，未代用户修改 DSH 配置，也未取得 DSH 真实调用成功证据。** 不把此前 Codex 或 SDK 测试算作 DSH 验收。
+
+1. 从普通应用目录启动绘境，新建空白测试工程并保持窗口开启；如需导入素材，先在界面授权素材文件夹。
+2. 在正在使用的 DSH 配置范围新增一个本地 stdio MCP 服务；下列为单个原生插件条目，不覆盖现有完整配置。不需要另填模型 API Key。
+
+```yaml
+- id: mcp-picture-book-studio
+  name: '@deepseek-ai/dsh-mcp-client'
+  config:
+    serverName: picture_book_studio
+    transport: stdio
+    command: 'E:/code_env/nodejs/node.exe'
+    args:
+      - 'E:/PictureBookStudio-preview/resources/app/dist-electron/bridge.mjs'
+```
+
+这是本机已核对的 Node 与打包 bridge 路径；其他机器应替换路径。配置格式依据此前核对的 [DSH 官方 MCP client 说明](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/mcp/mcp-client/README.md)，具体 UI 入口依宿主而定。
+
+3. 保存并重新加载配置，确认出现 `mcp__picture_book_studio__project_get` 等六工具，再调用 `project_get` 读取当前工程；工具可见与读写成功分别确认。
+4. 首次测试仅操作空白测试工程：创建开始、森林、湖畔、结束四页；连接开始→森林/湖畔、森林→开始/结束、湖畔→结束；保存并重新读取核对。要求 Agent 只用 MCP、不直接改 JSON，使用真实 ID、最新 revision 和唯一 requestId。观察界面同步，再手动预览分支与回连。
+
+完成后记录实际成功/失败调用和界面结果，再更新验收状态。现有接口尚未开放完整排版、文字与动画编辑，不能据此要求 Agent 自动完成全部编辑器功能。讨论来源见 [D-024](../DISCUSSION-LOG.md#d-024)。
+
 ## 六个工具
 
 | 工具 | 作用 | 业务参数 |

@@ -50,6 +50,9 @@ Windows x64 应用包已生成；功能证据、环境限制和未完成验收�
 - [全局设计与发展规划](docs/product-roadmap.md)
 - [MVP 实施基线 v0.7](docs/product-plan-mvp.md)
 - [实施计划](docs/superpowers/plans/2026-10-28-mvp-first-run.md)
-- [项目约定](AGENTS.md)、[需求裁决](QUESTIONS.md)、[反馈](FEEDBACK.md)、[开发记录](DEVLOG.md)
+- [项目约定](AGENTS.md)、[当前裁决与历史决定](QUESTIONS.md)、[反馈整改清单](FEEDBACK.md)
+- [阶段开发记录](DEVLOG.md)、[逐轮讨论与旧记录映射](DISCUSSION-LOG.md)
+
+当前未关闭事项以反馈清单为准。DSH 已提供接入步骤，尚无已安装或连接成功的实测记录；参见 [DSH 接入](docs/agent-tools.md#dsh)。
 
 原绘本 `E:/code saving/INTERACTIVE-NARRATIVE-SYSTEM/` 只作参考，本次未修改。项目使用已安装的 project-change-delivery 技能，纯本地 Git 管理。
