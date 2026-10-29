@@ -1,5 +1,11 @@
 # 开发记录
 
+## 2026-10-29：确定 DSH 主实现协作方式
+
+- 成果：按用户要求更新 AGENTS.md，默认 DSH 实现代码，Codex 拆解、协调、复核和验收；视觉与多模态工作按能力由 Codex 承担，明确并行所有权和必要接手边界。
+- 验证：核对分工覆盖、持续授权与失败处理，文档链接及 Git 差异格式检查；仅文档改动，未运行应用测试。既有 QUESTIONS.md 未提交修改保持不动。
+- 来源：[D-026](DISCUSSION-LOG.md#d-026)。
+
 按交付阶段汇总成果；逐轮要求、纠正与推进见 [DISCUSSION-LOG](DISCUSSION-LOG.md)，决策见 [QUESTIONS](QUESTIONS.md)，当前问题见 [FEEDBACK](FEEDBACK.md)，检查范围和证据见 [验收记录](docs/acceptance.md)。原逐轮日志已建立迁移索引，历史全文可从提交 `176ab0a` 及之前版本追溯。
 
 ## 2026-10-27：项目基础
