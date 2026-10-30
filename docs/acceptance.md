@@ -9,6 +9,19 @@
 - 检查结果：11 份 Markdown 的相对链接/锚点检查通过；Q-001—Q-019、D-001—D-025 编号唯一、迁移映射完整；反馈总览与详情一致；已有两处未提交文字保全检查及 Git 差异格式检查通过。不重跑应用测试，下面的功能验证均为对应历史版本的结果。
 - 仍待确认：FB-001 用户新入口复验、DSH 接入与实际调用、完整正式 MVP 验收。没有由本次文档整理推定完成。
 
+<a id="terminal-ui-20261030"></a>
+
+## 2026-10-30：终端 UI 与退出确认接入
+
+- 对应计划：[终端 UI 接入计划](superpowers/plans/2026-10-30-terminal-ui.md)；裁决见 [Q-021](../QUESTIONS.md#q-021)。本记录只证明代理实现与自动化回归，不代表用户视觉复验或正式 MVP 全部完成。
+- 范围：命令分组与双工作区入口、终端主题、深色 React Flow、作品画面隔离、退出／新建／打开前的未保存确认、焦点输入 flush、保存失败重试。未实施 Q-020 暂缓的连线分类，未新增设置菜单入口。
+- 版本：分支 `feat/mvp-first-run`，基于 `f5af14c` 的未提交集成；打包 ZIP 与普通目录副本在同轮生成。环境为 Windows、Node 24.14.1、Electron 45.1.0。
+- 自动检查：`npm test` 33/33、`npm run typecheck`、`npm run build`、`npm run format:check`、`git diff --check` 通过。构建仍有第三方 `use-client`／注释警告和单 chunk 超 500 kB 提示，无构建失败。
+- 真实 Electron：使用普通目录副本 `E:/PictureBookStudio-terminal-ui-20261030/PictureBookStudio-win32-x64/PictureBookStudio.exe`，默认启动无 `--no-sandbox`，窗口 sandbox/contextIsolation 开启、nodeIntegration 关闭。`scripts/smoke.mjs`、`scripts/ui-acceptance.mjs`、`scripts/integration.mjs`、`scripts/playback-acceptance.mjs`、`scripts/flush-acceptance.mjs` 均通过。
+- 终端 UI 专项：确认主题变量为 `#0d0f0e`；四个命令分组和 `toolbar` 可访问；页面编辑与流程切换保留数据；未失焦文字在关闭前被 flush；取消退出不关窗；把 `project.json` 设为只读后点“保存并退出”，窗口保持、错误可读、编辑内容保留，恢复写入后取消可继续；预览中的退出请求先显示主题内确认，取消后仍停留在播放器；最后“保存并退出”落盘成功。
+- 证据：专项运行目录 `.agent/runs/ui-integration-20261030/check-1793345105615/`（含 result.json），可长期查看的截图已整理为 [流程](screenshots/terminal-flow.png)、[页面编辑](screenshots/terminal-editor.png)、[退出确认](screenshots/terminal-leave.png)、[保存失败](screenshots/terminal-save-failure.png)。其他脚本的工程、profile 与截图在 gitignored 的 `.agent/runs/mvp/`。
+- 仍待确认：用户对终端主题、中文可读性、按钮密度、退出弹窗和真实系统 DPI 的体验复验；没有执行人工听感、完整正式 MVP 验收或远程发布。
+
 <a id="startup-recheck"></a>
 ## 2026-10-29：FB-001 默认启动复验（当前补充）
 

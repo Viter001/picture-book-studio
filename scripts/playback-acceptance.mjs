@@ -10,11 +10,14 @@ await cp('examples/林间来信', dir, { recursive: true });
 const env = { ...process.env, STUDIO_USER_DATA: profile, TEMP: run, TMP: run };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
+  ...(process.env.STUDIO_EXECUTABLE
+    ? { executablePath: resolve(process.env.STUDIO_EXECUTABLE) }
+    : {}),
   args: [
     ...(process.env.STUDIO_TEST_NO_SANDBOX === '1'
       ? ['--no-sandbox', '--disable-gpu', '--disable-breakpad', '--disable-crash-reporter']
       : []),
-    '.',
+    ...(process.env.STUDIO_EXECUTABLE ? [] : ['.']),
     `--project=${dir}`,
   ],
   env,

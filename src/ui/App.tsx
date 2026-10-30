@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -15,6 +15,10 @@ import '@xyflow/react/dist/style.css';
 import { issues, type Project, type Page, type Layer, type Command } from '../core/project';
 import { type State, assetURL } from './api';
 import { Scene, Player } from './Scene';
+import { LeaveDialog } from './LeaveDialog';
+import { globalKeyIntent, leaveReducer, type LeaveChoice, type LeaveState } from './leave';
+const commandGroups = ['文件', '开始', '插入', '视图'] as const;
+type CommandGroup = (typeof commandGroups)[number];
 type CardData = {
   page: Page;
   project: Project;
@@ -120,7 +124,10 @@ export function App() {
     [newError, setNewError] = useState(''),
     [deleting, setDeleting] = useState(false),
     [preview, setPreview] = useState<{ snapshot: Project; startId: string } | null>(null),
-    [tab, setTab] = useState<'layers' | 'assets'>('layers');
+    [tab, setTab] = useState<'layers' | 'assets'>('layers'),
+    [commandTab, setCommandTab] = useState<CommandGroup>('开始');
+  const [leave, dispatchLeave] = useReducer(leaveReducer, null);
+  const leaveRef = useRef<LeaveState>(null);
   const viewport = useRef<Viewport>({ x: 40, y: 40, zoom: 0.8 });
   const flow = useRef<ReactFlowInstance<Node<CardData>, any> | null>(null);
   const fitted = useRef('');
@@ -152,7 +159,15 @@ export function App() {
     setSelected(id);
     setLayerId('');
     setMode('page');
+    setCommandTab('开始');
     setEdgeId('');
+  }
+  function showFlow() {
+    setMode('flow');
+    stopAudition();
+  }
+  function showPage() {
+    if (page) setMode('page');
   }
   function stopAudition() {
     if (audition.current) {
@@ -180,6 +195,24 @@ export function App() {
     setNewError('');
     setNewDialog(true);
   }
+  function answerLeave(choice: LeaveChoice) {
+    if (!leave || leave.busy) return;
+    const id = leave.prompt.id;
+    if (choice === 'cancel') {
+      dispatchLeave({ type: 'cancel' });
+      window.studio.respondLeave(id, choice);
+      return;
+    }
+    dispatchLeave({ type: 'responding' });
+    try {
+      window.studio.respondLeave(id, choice);
+    } catch {
+      dispatchLeave({
+        type: 'result',
+        result: { id, ok: false, error: '无法提交保存确认，请重试。' },
+      });
+    }
+  }
   function fitFlow() {
     const inst = flow.current;
     if (!inst) return;
@@ -195,10 +228,24 @@ export function App() {
     run();
   }
   useEffect(() => {
+    leaveRef.current = leave;
+  }, [leave]);
+  useEffect(() => {
     invoke('state');
     const off = window.studio.subscribe(setState);
+    const offLeave = window.studio.onLeaveRequest((prompt) => {
+      setError('');
+      dispatchLeave({ type: 'request', prompt });
+    });
+    const offResult = window.studio.onLeaveResult((result) => {
+      dispatchLeave({ type: 'result', result });
+      if (result.closed && !result.ok && leaveRef.current?.prompt.id === result.id)
+        setError(result.error || '操作已取消。');
+    });
     return () => {
       off();
+      offLeave();
+      offResult();
       stopAudition();
     };
   }, []);
@@ -241,39 +288,53 @@ export function App() {
   }, [project?.id, project?.pages.length, nodes.length]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPreview(null);
-      const target = e.target as HTMLElement;
-      if (preview) return;
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      const target = e.target instanceof HTMLElement ? e.target : null;
+      const intent = globalKeyIntent(
+        {
+          key: e.key,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          shiftKey: e.shiftKey,
+          targetTag: target?.tagName,
+        },
+        { preview: !!preview, leaveOpen: !!leave },
+      );
+      if (intent === 'exit-preview') {
+        setPreview(null);
+        return;
+      }
+      if (intent === 'save') {
         e.preventDefault();
         invoke('save');
         return;
       }
-      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if (intent === 'undo' || intent === 'redo') {
         e.preventDefault();
-        invoke(e.shiftKey ? 'redo' : 'undo');
+        invoke(intent);
       }
     };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
-  }, [preview]);
+  }, [preview, leave]);
   const edges = useMemo(
     () =>
       project?.pages.flatMap((p) =>
         p.exits
           .filter((e) => e.target)
-          .map((e) => ({
-            id: e.id,
-            source: p.id,
-            target: e.target!,
-            sourceHandle: e.id,
-            targetHandle: 'in',
-            label: e.label || '继续',
-            selected: e.id === edgeId,
-            style: { stroke: e.id === edgeId ? '#be7d43' : '#78958c', strokeWidth: 2 },
-            markerEnd: { type: 'arrowclosed' as any, color: '#78958c' },
-          })),
+          .map((e) => {
+            const stroke = e.id === edgeId ? '#dfff00' : '#4ec97a';
+            return {
+              id: e.id,
+              source: p.id,
+              target: e.target!,
+              sourceHandle: e.id,
+              targetHandle: 'in',
+              label: e.label || '继续',
+              selected: e.id === edgeId,
+              style: { stroke, strokeWidth: 2 },
+              markerEnd: { type: 'arrowclosed' as any, color: stroke },
+            };
+          }),
       ) ?? [],
     [project, edgeId],
   );
@@ -299,6 +360,16 @@ export function App() {
       ?.layers.find((l: Layer) => !ids.has(l.id));
     if (l) setLayerId(l.id);
   }
+  function addText() {
+    if (!page) return;
+    setMode('page');
+    void addLayer('text');
+  }
+  function addImage() {
+    if (!page) return;
+    setTab('assets');
+    setMode('page');
+  }
   async function importAssets() {
     const r = await invoke('import');
     if (r?.results) {
@@ -311,6 +382,17 @@ export function App() {
   }
   const edgePage = project?.pages.find((p) => p.exits.some((e) => e.id === edgeId));
   const edge = edgePage?.exits.find((e) => e.id === edgeId);
+  const leaveDialog = leave ? (
+    <LeaveDialog
+      key={leave.prompt.id}
+      prompt={leave.prompt}
+      busy={leave.busy}
+      error={leave.error}
+      onSave={() => answerLeave('save')}
+      onDiscard={() => answerLeave('discard')}
+      onCancel={() => answerLeave('cancel')}
+    />
+  ) : null;
   if (preview)
     return (
       <>
@@ -322,6 +404,7 @@ export function App() {
           onClose={() => setPreview(null)}
         />
         {error && <div className="toast error">{error}</div>}
+        {leaveDialog}
       </>
     );
   return (
@@ -343,13 +426,9 @@ export function App() {
           <button onClick={() => invoke('open')}>打开</button>
           {project && (
             <>
-              <button disabled={!state.canUndo} onClick={() => invoke('undo')} title="Ctrl+Z">
-                撤销
+              <button onClick={() => invoke('save')} title="Ctrl+S">
+                保存
               </button>
-              <button disabled={!state.canRedo} onClick={() => invoke('redo')} title="Ctrl+Shift+Z">
-                重做
-              </button>
-              <button onClick={() => invoke('save')}>保存</button>
               <button
                 className="primary"
                 disabled={!project.startPageId}
@@ -405,20 +484,42 @@ export function App() {
         </main>
       ) : (
         <>
-          <nav className="workspace-bar">
-            <div className="workspace-label">
-              {mode === 'page' ? (
+          <nav className="command-tabs" role="tablist" aria-label="命令分组">
+            {commandGroups.map((group) => (
+              <button
+                key={group}
+                type="button"
+                role="tab"
+                id={`command-tab-${group}`}
+                aria-controls="command-ribbon"
+                aria-selected={commandTab === group}
+                tabIndex={commandTab === group ? 0 : -1}
+                className={`command-tab${commandTab === group ? ' active' : ''}`}
+                onClick={() => setCommandTab(group)}
+                onKeyDown={(event) => {
+                  const index = commandGroups.indexOf(group);
+                  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+                  event.preventDefault();
+                  const next =
+                    commandGroups[
+                      (index + (event.key === 'ArrowRight' ? 1 : -1) + commandGroups.length) %
+                        commandGroups.length
+                    ];
+                  setCommandTab(next);
+                  document.getElementById(`command-tab-${next}`)?.focus();
+                }}
+              >
+                {group}
+              </button>
+            ))}
+            <div className="workspace-context">
+              {mode === 'page' && page ? (
                 <>
-                  <button
-                    onClick={() => {
-                      setMode('flow');
-                      stopAudition();
-                    }}
-                  >
+                  <button type="button" onClick={showFlow}>
                     ← 返回流程
                   </button>
                   <span className="divider" />
-                  <strong>{page?.name}</strong>
+                  <strong>{page.name}</strong>
                 </>
               ) : (
                 <>
@@ -428,29 +529,150 @@ export function App() {
                 </>
               )}
             </div>
-            <div>
-              {mode === 'flow' ? (
-                <button className="primary" onClick={addPage}>
-                  ＋ 新增页面
-                </button>
-              ) : (
-                <>
-                  <button onClick={() => addLayer('text')}>＋ 添加文字</button>
-                  <button
-                    onClick={() => {
-                      setTab('assets');
-                    }}
-                  >
-                    ＋ 添加图片
-                  </button>
-                </>
-              )}
-              <button onClick={importAssets}>导入素材</button>
-              <button disabled={!page} onClick={() => start(page?.id ?? null)}>
-                预览当前页
+            <div className="workspace-switch" role="group" aria-label="工作区切换">
+              <button
+                type="button"
+                className={mode === 'flow' ? 'active' : ''}
+                aria-pressed={mode === 'flow'}
+                onClick={showFlow}
+              >
+                ◇ 流程编排
+              </button>
+              <button
+                type="button"
+                className={mode === 'page' ? 'active' : ''}
+                aria-pressed={mode === 'page'}
+                disabled={!page}
+                onClick={showPage}
+              >
+                ▣ 页面编辑
               </button>
             </div>
           </nav>
+          <div
+            id="command-ribbon"
+            className="command-ribbon"
+            role="tabpanel"
+            aria-labelledby={`command-tab-${commandTab}`}
+          >
+            <div className="command-tools" role="toolbar" aria-label={`${commandTab}命令`}>
+              {commandTab === '文件' && (
+                <>
+                  <button type="button" onClick={openNew}>
+                    新建
+                  </button>
+                  <button type="button" onClick={() => invoke('open')}>
+                    打开
+                  </button>
+                  <button type="button" onClick={() => invoke('save')}>
+                    保存
+                  </button>
+                  <span className="divider" />
+                  <small className="muted">新建、打开或保存当前工程</small>
+                </>
+              )}
+              {commandTab === '开始' &&
+                (mode === 'flow' ? (
+                  <>
+                    <button type="button" className="primary" onClick={addPage}>
+                      ＋ 新增页面
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!state.canUndo}
+                      onClick={() => invoke('undo')}
+                      title="Ctrl+Z"
+                    >
+                      撤销
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!state.canRedo}
+                      onClick={() => invoke('redo')}
+                      title="Ctrl+Shift+Z"
+                    >
+                      重做
+                    </button>
+                    <button type="button" onClick={importAssets}>
+                      导入素材
+                    </button>
+                    <button type="button" disabled={!page} onClick={() => start(page?.id ?? null)}>
+                      预览当前页
+                    </button>
+                    <span className="divider" />
+                    <small className="muted">编排故事的路径与节奏</small>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" disabled={!page} onClick={addText}>
+                      ＋ 添加文字
+                    </button>
+                    <button type="button" disabled={!page} onClick={addImage}>
+                      ＋ 添加图片
+                    </button>
+                    <button type="button" onClick={importAssets}>
+                      导入素材
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!state.canUndo}
+                      onClick={() => invoke('undo')}
+                      title="Ctrl+Z"
+                    >
+                      撤销
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!state.canRedo}
+                      onClick={() => invoke('redo')}
+                      title="Ctrl+Shift+Z"
+                    >
+                      重做
+                    </button>
+                    <button type="button" disabled={!page} onClick={() => start(page?.id ?? null)}>
+                      预览当前页
+                    </button>
+                    <span className="divider" />
+                    <small className="muted">编辑页面中的内容与图层</small>
+                  </>
+                ))}
+              {commandTab === '插入' && (
+                <>
+                  <button type="button" disabled={!page} onClick={addText}>
+                    ＋ 添加文字
+                  </button>
+                  <button type="button" disabled={!page} onClick={addImage}>
+                    ＋ 添加图片
+                  </button>
+                  <button type="button" onClick={importAssets}>
+                    导入素材
+                  </button>
+                  <button type="button" onClick={addPage}>
+                    ＋ 新增页面
+                  </button>
+                  <span className="divider" />
+                  <small className="muted">
+                    {page ? '把文字、图片与素材放进故事' : '先选择一张页面，再添加内容'}
+                  </small>
+                </>
+              )}
+              {commandTab === '视图' && (
+                <>
+                  <button type="button" disabled={mode === 'flow'} onClick={showFlow}>
+                    ◇ 流程编排
+                  </button>
+                  <button type="button" disabled={mode === 'page' || !page} onClick={showPage}>
+                    ▣ 页面编辑
+                  </button>
+                  <button type="button" disabled={mode !== 'flow'} onClick={fitFlow}>
+                    适应画布
+                  </button>
+                  <span className="divider" />
+                  <small className="muted">切换工作区与画布视图</small>
+                </>
+              )}
+            </div>
+          </div>
           {mode === 'flow' ? (
             <div className="flow-layout">
               <main className="flow-canvas">
@@ -1027,6 +1249,7 @@ export function App() {
                 setNewDialog(false);
                 setNewError('');
                 setMode('flow');
+                setCommandTab('开始');
                 setSelected('');
                 viewport.current = { x: 40, y: 40, zoom: 0.8 };
                 flow.current?.setViewport({ x: 40, y: 40, zoom: 0.8 });
@@ -1143,6 +1366,7 @@ export function App() {
           </div>
         </div>
       )}
+      {leaveDialog}
     </div>
   );
 }

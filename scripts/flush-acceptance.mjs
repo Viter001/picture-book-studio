@@ -10,11 +10,14 @@ await cp('examples/林间来信', dir, { recursive: true });
 const env = { ...process.env, STUDIO_USER_DATA: profile, TEMP: run, TMP: run };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
+  ...(process.env.STUDIO_EXECUTABLE
+    ? { executablePath: resolve(process.env.STUDIO_EXECUTABLE) }
+    : {}),
   args: [
     ...(process.env.STUDIO_TEST_NO_SANDBOX === '1'
       ? ['--no-sandbox', '--disable-gpu', '--disable-breakpad', '--disable-crash-reporter']
       : []),
-    '.',
+    ...(process.env.STUDIO_EXECUTABLE ? [] : ['.']),
     `--project=${dir}`,
   ],
   env,
@@ -49,9 +52,6 @@ try {
   await page.locator('.modal .form-error').filter({ hasText: '已有工程' }).waitFor();
   await page.getByRole('button', { name: '取消', exact: true }).click();
   await page.getByLabel('文字内容').fill('关闭前未失焦也必须保存');
-  await app.evaluate(({ dialog }) => {
-    dialog.showMessageBox = async () => ({ response: 0, checkboxChecked: false });
-  });
   const exit = app.waitForEvent('close');
   await app.evaluate(({ BrowserWindow }) => {
     setTimeout(
@@ -62,12 +62,14 @@ try {
       0,
     );
   });
+  await page.getByRole('dialog', { name: '退出前保存更改？' }).waitFor();
+  await page.getByRole('button', { name: '保存并退出', exact: true }).click();
   await exit;
   closed = true;
   disk = JSON.parse(await readFile(join(dir, 'project.json'), 'utf8'));
   assert.equal(disk.pages[0].layers.find((l) => l.type === 'text').text, '关闭前未失焦也必须保存');
   console.log(
-    'PASS: pending text flush before preview, keyboard save and native close; failed new project reports inside modal.',
+    'PASS: pending text flush before preview, keyboard save and themed close confirmation; failed new project reports inside modal.',
     run,
   );
 } finally {

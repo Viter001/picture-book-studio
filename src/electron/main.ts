@@ -14,6 +14,14 @@ import {
   type Asset,
 } from '../core/project';
 import { saveProject, loadProject, checkedAssetPath } from './storage';
+import {
+  confirmLeave,
+  isTrustedSender,
+  type LeaveChoice,
+  type LeavePrompt,
+  type LeaveReason,
+  type LeaveResult,
+} from './leave';
 if (process.env.STUDIO_USER_DATA) {
   if (!isAbsolute(process.env.STUDIO_USER_DATA)) throw Error('STUDIO_USER_DATA 必须是绝对路径');
   mkdirSync(process.env.STUDIO_USER_DATA, { recursive: true });
@@ -33,7 +41,16 @@ let service: CommandService | null = null,
 const media = new Map<string, string>();
 let queue = Promise.resolve<unknown>(null);
 const flushes = new Map<string, (error?: string) => void>();
+const leaveWaiters = new Map<
+  string,
+  { resolve: (choice: LeaveChoice) => void; timer: ReturnType<typeof setTimeout> }
+>();
+let leaveOpen = false;
+let rendererGone = false;
+const LEAVE_TIMEOUT = 5 * 60 * 1000;
 function flushRenderer(): Promise<void> {
+  if (!win || win.isDestroyed() || win.webContents.isDestroyed())
+    return Promise.reject(Error('窗口不可用，未执行保存或关闭'));
   return new Promise((resolve, reject) => {
     const id = uid();
     const timer = setTimeout(() => {
@@ -90,18 +107,67 @@ async function save() {
   await saveProject(root, active().project);
   saved = JSON.stringify({ ...active().project, revision: 0 });
 }
-async function mayLeave() {
-  if (!dirty()) return true;
-  const r = await dialog.showMessageBox(win, {
-    type: 'question',
-    message: '工程有未保存修改',
-    buttons: ['保存', '放弃修改', '取消'],
-    defaultId: 0,
-    cancelId: 2,
+function sendLeaveResult(result: LeaveResult) {
+  if (!win || win.isDestroyed() || win.webContents.isDestroyed()) return;
+  try {
+    win.webContents.send('leave-result', result);
+  } catch {
+    // The window can disappear between the guard and the send.
+  }
+}
+function requestLeave(prompt: LeavePrompt) {
+  if (rendererGone || !win || win.isDestroyed() || win.webContents.isDestroyed())
+    throw Error('窗口不可用，无法确认未保存修改');
+  win.webContents.send('leave-request', prompt);
+}
+function nextLeaveChoice(id: string): Promise<LeaveChoice> {
+  if (rendererGone) return Promise.resolve('cancel');
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      if (!leaveWaiters.delete(id)) return;
+      sendLeaveResult({
+        id,
+        ok: false,
+        closed: true,
+        error: '等待确认超时，操作已取消。',
+      });
+      resolve('cancel');
+    }, LEAVE_TIMEOUT);
+    leaveWaiters.set(id, {
+      timer,
+      resolve: (choice) => {
+        if (!leaveWaiters.delete(id)) return;
+        clearTimeout(timer);
+        resolve(choice);
+      },
+    });
   });
-  if (r.response === 2) return false;
-  if (r.response === 0) await save();
-  return true;
+}
+async function mayLeave(reason: LeaveReason) {
+  if (!dirty()) return true;
+  if (leaveOpen) return false;
+  leaveOpen = true;
+  try {
+    return await confirmLeave(
+      {
+        isDirty: dirty,
+        id: uid,
+        projectName: () => active().project.name,
+        request: requestLeave,
+        nextChoice: nextLeaveChoice,
+        save,
+        notify: sendLeaveResult,
+      },
+      reason,
+    );
+  } finally {
+    leaveOpen = false;
+    for (const waiter of leaveWaiters.values()) {
+      clearTimeout(waiter.timer);
+      waiter.resolve('cancel');
+    }
+    leaveWaiters.clear();
+  }
 }
 async function openDirectory(dir: string) {
   const project = await loadProject(dir);
@@ -273,13 +339,16 @@ async function handle(action: string, payload: any) {
     case 'state':
       return state();
     case 'new': {
-      if (!(await mayLeave())) return null;
+      if (!(await mayLeave('new'))) return null;
       const project = createProject(payload.name, payload.width, payload.height);
       const pick = await dialog.showOpenDialog(win, {
         title: '选择空文件夹作为工程位置',
         properties: ['openDirectory', 'createDirectory'],
       });
-      if (pick.canceled) return null;
+      if (pick.canceled) {
+        await publish();
+        return null;
+      }
       const dir = pick.filePaths[0];
       try {
         await stat(join(dir, 'project.json'));
@@ -292,13 +361,16 @@ async function handle(action: string, payload: any) {
       break;
     }
     case 'open': {
-      if (!(await mayLeave())) return null;
+      if (!(await mayLeave('open'))) return null;
       const pick = await dialog.showOpenDialog(win, {
         title: '打开工程',
         filters: [{ name: '绘本工程', extensions: ['json'] }],
         properties: ['openFile'],
       });
-      if (pick.canceled) return null;
+      if (pick.canceled) {
+        await publish();
+        return null;
+      }
       const path = pick.filePaths[0];
       if (basename(path) !== 'project.json') throw Error('请选择 project.json');
       await openDirectory(join(path, '..'));
@@ -373,7 +445,7 @@ else {
         minWidth: 1000,
         minHeight: 700,
         title: '绘境 · 交互叙事工作台',
-        backgroundColor: '#f5f6f3',
+        backgroundColor: '#0d0f0e',
         webPreferences: {
           preload: join(__dirname, 'preload.cjs'),
           sandbox: true,
@@ -385,13 +457,39 @@ else {
       win.removeMenu();
       win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
       win.webContents.on('will-navigate', (e) => e.preventDefault());
+      const trusted = (event: { sender: unknown; senderFrame: unknown }) =>
+        !!win &&
+        !win.isDestroyed() &&
+        !win.webContents.isDestroyed() &&
+        isTrustedSender(
+          event.sender,
+          event.senderFrame,
+          win.webContents,
+          win.webContents.mainFrame,
+        );
+      const cancelPendingLeave = () => {
+        for (const waiter of leaveWaiters.values()) waiter.resolve('cancel');
+        leaveWaiters.clear();
+      };
+      win.webContents.on('render-process-gone', () => {
+        rendererGone = true;
+        cancelPendingLeave();
+      });
+      win.webContents.on('destroyed', () => {
+        rendererGone = true;
+        cancelPendingLeave();
+      });
       ipcMain.on('flush-editor-done', (event, id, error) => {
-        if (event.sender === win.webContents && event.senderFrame === win.webContents.mainFrame)
-          flushes.get(id)?.(error);
+        if (!trusted(event) || typeof id !== 'string') return;
+        flushes.get(id)?.(typeof error === 'string' ? error : undefined);
+      });
+      ipcMain.on('leave-response', (event, id, choice) => {
+        if (!trusted(event) || typeof id !== 'string') return;
+        if (choice !== 'save' && choice !== 'discard' && choice !== 'cancel') return;
+        leaveWaiters.get(id)?.resolve(choice);
       });
       ipcMain.handle('studio', async (event, action, payload) => {
-        if (event.sender !== win.webContents || event.senderFrame !== win.webContents.mainFrame)
-          throw Error('INVALID_SENDER');
+        if (!trusted(event)) throw Error('INVALID_SENDER');
         try {
           if (['save', 'open', 'new'].includes(action)) await flushRenderer();
           return { ok: true, value: await serialize(() => handle(action, payload)) };
@@ -404,12 +502,12 @@ else {
       win.on('close', (e) => {
         if (closing) return;
         e.preventDefault();
-        if (closePending) return;
+        if (closePending || leaveOpen) return;
         closePending = true;
         flushRenderer()
           .then(() =>
             serialize(async () => {
-              if (await mayLeave()) {
+              if (await mayLeave('close')) {
                 closing = true;
                 win.close();
               }
