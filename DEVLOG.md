@@ -1,5 +1,12 @@
 # 开发记录
 
+## 2026-10-30：建立私有 GitHub 仓库并推送
+
+- 成果：创建私有仓库 `Viter001/picture-book-studio`，默认分支设为 `main`；已推送 `main` 与 `feat/mvp-first-run`，两者指向同一已验证提交。
+- 认证与安全：使用本机 GitHub CLI 完成账号授权，凭据和便携工具只保存在 gitignored 的 `.agent/tools/`；`.gitignore` 已显式排除，未提交任何 token 或登录配置。
+- 交付约定：用户试用入口固定为 `E:/Test/PictureBookStudio/PictureBookStudio.exe`，后续更新替换该目录并删除旧版。见 [D-033](DISCUSSION-LOG.md#d-033)、[D-034](DISCUSSION-LOG.md#d-034)。
+- 状态：源码与记录已上传；未上传安装包，未创建公开 Release，也未执行远程 CI 或发布。
+
 ## 2026-10-30：补齐流程连线方向着色
 
 - 反馈：用户查看生产界面后指出连线仍没有按不同方向区分颜色。核对确认此前按 Q-020 暂缓，只保留了统一的绿色基础连线，属于交付预期缺口。

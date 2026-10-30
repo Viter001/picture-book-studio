@@ -44,7 +44,7 @@ npm run package
 
 Windows x64 应用包已生成；功能证据、环境限制和未完成验收项见 [验收记录](docs/acceptance.md)。2026-10-29 已定位工作区低完整性标签造成的启动问题；同一程序部署到普通目录后，默认 GPU/沙箱的真实 Electron 编辑和分支预览回归通过。此前“需关闭沙箱才能自动化”的记录是受影响目录下的历史结果，不再作为交付方式。真实系统 DPI 与用户体验仍待人工验收。
 
-本版不包含视频、隐藏数值/条件系统、云同步、作品独立网页或游戏发布。没有上传远程仓库或发布安装包。
+本版不包含视频、隐藏数值/条件系统、云同步、作品独立网页或游戏发布。源码已推送到私有 GitHub 仓库 [Viter001/picture-book-studio](https://github.com/Viter001/picture-book-studio)；未上传安装包或创建公开 Release。
 
 ## 项目文档
 
@@ -56,4 +56,4 @@ Windows x64 应用包已生成；功能证据、环境限制和未完成验收�
 
 当前未关闭事项以反馈清单为准。DSH 已提供接入步骤，尚无已安装或连接成功的实测记录；参见 [DSH 接入](docs/agent-tools.md#dsh)。
 
-原绘本 `E:/code saving/INTERACTIVE-NARRATIVE-SYSTEM/` 只作参考，本次未修改。项目使用已安装的 project-change-delivery 技能，纯本地 Git 管理。
+原绘本 `E:/code saving/INTERACTIVE-NARRATIVE-SYSTEM/` 只作参考，本次未修改。项目使用已安装的 project-change-delivery 技能，代码与记录通过私有 GitHub 仓库管理。

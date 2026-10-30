@@ -326,3 +326,12 @@ Q-005 的页面转场补充另见 D-006；原 DEVLOG 的首版实现启动及实
 - 本轮处理：把固定用户入口写进项目协作约定；将最新便携包部署为 `E:/Test/PictureBookStudio/PictureBookStudio.exe`，删除两个旧的 `E:/PictureBookStudio-*` 试用副本。项目内 `release/` 仍保留当前构建产物。
 - 结果与未决：后续更新只需替换 `E:/Test/PictureBookStudio`；用户对连线方向规则和界面的复验仍待完成。
 - 关联：[项目协作约定](../AGENTS.md)、[连线方向验收](docs/acceptance.md#edge-directions-20261030)。
+
+<a id="d-034"></a>
+## D-034：创建私有 GitHub 仓库并推送
+
+- 日期：2026-10-30。
+- 用户提出：把项目推到 GitHub；没有仓库就创建。
+- 本轮处理：安装并配置 GitHub CLI，完成 GitHub 账号授权；创建私有仓库 `Viter001/picture-book-studio`，默认分支设为 `main`，推送 `main` 与 `feat/mvp-first-run`。本地登录工具与凭据放在 gitignored 的 `.agent/tools/`，未进入版本库。
+- 结果与未决：源码、提交记录与项目文档已上传；安装包未上传、未创建公开 Release、未配置远程 CI。仓库保持私有。
+- 关联：[GitHub 仓库](https://github.com/Viter001/picture-book-studio)、[开发记录](DEVLOG.md#20261030建立私有-github-仓库并推送)。

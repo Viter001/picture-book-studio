@@ -19,7 +19,7 @@
 - 本项目根目录：`E:/code saving/PICTURE-BOOK-STUDIO`。遵循父级 AGENTS.md。
 - 使用已安装的 `project-change-delivery` 技能（本次文档迁移依据 v0.2.0）；技能入口为 `C:/Users/gaozh/.codex/skills/project-change-delivery/SKILL.md`，后续以实际读取版本为准。
 - 完成变更后执行相关验证、更新 DEVLOG.md，并创建中文标题和说明的 Git 提交；只提交本次相关文件。
-- 当前为纯本地仓库。推送、远程建库与发布须有用户授权。
+- 私有远程仓库已建立：`https://github.com/Viter001/picture-book-studio`，默认分支 `main`。推送、远程变更与发布仍须有用户授权。
 - 普通用户试用入口固定为 `E:/Test/PictureBookStudio/PictureBookStudio.exe`；每次生成新版后更新该目录，并删除旧的 `E:/PictureBookStudio-*` 试用副本，不在项目工作区长期保留可执行交付目录。
 - 原绘本项目是参考来源，不因本项目任务自动获得修改原项目的授权。原始材料保持不动。
 - GraphFlow 代码探索先检查实际可用工具；调用必须显式传入本项目 rootDir，禁止使用父级集合目录。不安装 GraphFlow 或自动 hooks，不修改 ACL 和密钥配置。
