@@ -17,6 +17,7 @@ import { type State, assetURL } from './api';
 import { Scene, Player } from './Scene';
 import { LeaveDialog } from './LeaveDialog';
 import { globalKeyIntent, leaveReducer, type LeaveChoice, type LeaveState } from './leave';
+import { classifyEdge, EDGE_DIRECTION_COLORS, type EdgeDirection } from './edge-direction';
 const commandGroups = ['文件', '开始', '插入', '视图'] as const;
 type CommandGroup = (typeof commandGroups)[number];
 type CardData = {
@@ -322,7 +323,9 @@ export function App() {
         p.exits
           .filter((e) => e.target)
           .map((e) => {
-            const stroke = e.id === edgeId ? '#dfff00' : '#4ec97a';
+            const direction = classifyEdge(project, p.id, e.target!);
+            const stroke = EDGE_DIRECTION_COLORS[direction];
+            const selected = e.id === edgeId;
             return {
               id: e.id,
               source: p.id,
@@ -330,8 +333,11 @@ export function App() {
               sourceHandle: e.id,
               targetHandle: 'in',
               label: e.label || '继续',
-              selected: e.id === edgeId,
-              style: { stroke, strokeWidth: 2 },
+              selected,
+              className: selected ? 'edge-selected' : undefined,
+              data: { direction },
+              style: { stroke, strokeWidth: selected ? 3 : 2 },
+              labelStyle: { fill: stroke, fontWeight: selected ? 700 : 400 },
               markerEnd: { type: 'arrowclosed' as any, color: stroke },
             };
           }),
@@ -730,6 +736,20 @@ export function App() {
                     </button>
                   </div>
                 )}
+                <div className="flow-legend" aria-label="连线方向图例">
+                  {(
+                    [
+                      ['forward', '前进'],
+                      ['loop', '循环'],
+                      ['back', '后退'],
+                    ] as const
+                  ).map(([direction, label]) => (
+                    <span key={direction}>
+                      <i style={{ background: EDGE_DIRECTION_COLORS[direction] }} />
+                      {label}
+                    </span>
+                  ))}
+                </div>
                 <div className="canvas-hint">拖动画布平移 · 滚轮缩放 · 双击卡片编辑页面</div>
               </main>
               <aside className="inspector">

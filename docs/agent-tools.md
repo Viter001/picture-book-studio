@@ -41,7 +41,7 @@ Codex 可用单次 `-c` 覆盖临时配置，不必修改全局配置；实际�
     transport: stdio
     command: 'E:/code_env/nodejs/node.exe'
     args:
-      - 'E:/PictureBookStudio-preview/resources/app/dist-electron/bridge.mjs'
+      - 'E:/Test/PictureBookStudio/resources/app/dist-electron/bridge.mjs'
 ```
 
 这是本机已核对的 Node 与打包 bridge 路径；其他机器应替换路径。配置格式依据此前核对的 [DSH 官方 MCP client 说明](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/mcp/mcp-client/README.md)，具体 UI 入口依宿主而定。

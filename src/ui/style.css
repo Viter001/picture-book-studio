@@ -1150,3 +1150,32 @@ button:disabled {
   flex-wrap: wrap;
   min-width: 0;
 }
+
+.flow-legend {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  z-index: 5;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  background: #0d0f0ee8;
+  color: var(--muted);
+  font-size: 11px;
+  pointer-events: none;
+}
+.flow-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.flow-legend i {
+  width: 18px;
+  height: 2px;
+}
+.react-flow__edge.edge-selected .react-flow__edge-path {
+  filter: drop-shadow(0 0 3px #c5d0c0);
+}
