@@ -18,7 +18,8 @@ import { Scene, Player } from './Scene';
 import { LeaveDialog } from './LeaveDialog';
 import { globalKeyIntent, leaveReducer, type LeaveChoice, type LeaveState } from './leave';
 import { classifyEdge, EDGE_DIRECTION_COLORS, type EdgeDirection } from './edge-direction';
-const commandGroups = ['文件', '开始', '插入', '视图'] as const;
+import { WindowTitleBar } from './WindowTitleBar';
+const commandGroups = ['文件', '开始', '插入', '转场', '动画', '视图'] as const;
 type CommandGroup = (typeof commandGroups)[number];
 type CardData = {
   page: Page;
@@ -79,6 +80,7 @@ function Field({
   min,
   max,
   step,
+  disabled,
 }: {
   label: string;
   value: string | number;
@@ -87,6 +89,7 @@ function Field({
   min?: number;
   max?: number;
   step?: number;
+  disabled?: boolean;
 }) {
   return (
     <label className="field">
@@ -98,6 +101,7 @@ function Field({
         min={min}
         max={max}
         step={step}
+        disabled={disabled}
         onBlur={(e) => {
           const v = type === 'number' ? Number(e.target.value) : e.target.value;
           if (v !== value) onChange(v);
@@ -107,6 +111,14 @@ function Field({
         }}
       />
     </label>
+  );
+}
+function RibbonGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="ribbon-group" role="group" aria-label={title}>
+      <div className="ribbon-group-controls">{children}</div>
+      <span className="ribbon-group-title">{title}</span>
+    </div>
   );
 }
 export function App() {
@@ -401,7 +413,8 @@ export function App() {
   ) : null;
   if (preview)
     return (
-      <>
+      <div className="app player-shell">
+        <WindowTitleBar />
         <Player
           snapshot={preview.snapshot}
           startId={preview.startId}
@@ -411,10 +424,11 @@ export function App() {
         />
         {error && <div className="toast error">{error}</div>}
         {leaveDialog}
-      </>
+      </div>
     );
   return (
     <div className="app">
+      <WindowTitleBar />
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark">绘</span>
@@ -564,25 +578,23 @@ export function App() {
             <div className="command-tools" role="toolbar" aria-label={`${commandTab}命令`}>
               {commandTab === '文件' && (
                 <>
-                  <button type="button" onClick={openNew}>
-                    新建
-                  </button>
-                  <button type="button" onClick={() => invoke('open')}>
-                    打开
-                  </button>
-                  <button type="button" onClick={() => invoke('save')}>
-                    保存
-                  </button>
-                  <span className="divider" />
+                  <RibbonGroup title="工程">
+                    <button type="button" onClick={openNew}>
+                      新建
+                    </button>
+                    <button type="button" onClick={() => invoke('open')}>
+                      打开
+                    </button>
+                    <button type="button" onClick={() => invoke('save')}>
+                      保存
+                    </button>
+                  </RibbonGroup>
                   <small className="muted">新建、打开或保存当前工程</small>
                 </>
               )}
-              {commandTab === '开始' &&
-                (mode === 'flow' ? (
-                  <>
-                    <button type="button" className="primary" onClick={addPage}>
-                      ＋ 新增页面
-                    </button>
+              {commandTab === '开始' && (
+                <>
+                  <RibbonGroup title="编辑历史">
                     <button
                       type="button"
                       disabled={!state.canUndo}
@@ -599,81 +611,202 @@ export function App() {
                     >
                       重做
                     </button>
+                  </RibbonGroup>
+                  <RibbonGroup title="页面">
+                    {mode === 'flow' ? (
+                      <button type="button" className="primary" onClick={addPage}>
+                        ＋ 新增页面
+                      </button>
+                    ) : (
+                      <>
+                        <button type="button" disabled={!page} onClick={addText}>
+                          ＋ 添加文字
+                        </button>
+                        <button type="button" disabled={!page} onClick={addImage}>
+                          ＋ 添加图片
+                        </button>
+                      </>
+                    )}
+                  </RibbonGroup>
+                  <RibbonGroup title="素材">
                     <button type="button" onClick={importAssets}>
                       导入素材
                     </button>
+                  </RibbonGroup>
+                  <RibbonGroup title="预览">
                     <button type="button" disabled={!page} onClick={() => start(page?.id ?? null)}>
                       预览当前页
                     </button>
-                    <span className="divider" />
-                    <small className="muted">编排故事的路径与节奏</small>
-                  </>
-                ) : (
-                  <>
+                  </RibbonGroup>
+                  <small className="muted">
+                    {mode === 'flow' ? '编排故事的路径与节奏' : '编辑页面中的内容与图层'}
+                  </small>
+                </>
+              )}
+              {commandTab === '插入' && (
+                <>
+                  <RibbonGroup title="内容">
                     <button type="button" disabled={!page} onClick={addText}>
                       ＋ 添加文字
                     </button>
                     <button type="button" disabled={!page} onClick={addImage}>
                       ＋ 添加图片
                     </button>
+                  </RibbonGroup>
+                  <RibbonGroup title="素材">
                     <button type="button" onClick={importAssets}>
                       导入素材
                     </button>
-                    <button
-                      type="button"
-                      disabled={!state.canUndo}
-                      onClick={() => invoke('undo')}
-                      title="Ctrl+Z"
-                    >
-                      撤销
+                  </RibbonGroup>
+                  <RibbonGroup title="页面">
+                    <button type="button" onClick={addPage}>
+                      ＋ 新增页面
                     </button>
-                    <button
-                      type="button"
-                      disabled={!state.canRedo}
-                      onClick={() => invoke('redo')}
-                      title="Ctrl+Shift+Z"
-                    >
-                      重做
-                    </button>
-                    <button type="button" disabled={!page} onClick={() => start(page?.id ?? null)}>
-                      预览当前页
-                    </button>
-                    <span className="divider" />
-                    <small className="muted">编辑页面中的内容与图层</small>
-                  </>
-                ))}
-              {commandTab === '插入' && (
-                <>
-                  <button type="button" disabled={!page} onClick={addText}>
-                    ＋ 添加文字
-                  </button>
-                  <button type="button" disabled={!page} onClick={addImage}>
-                    ＋ 添加图片
-                  </button>
-                  <button type="button" onClick={importAssets}>
-                    导入素材
-                  </button>
-                  <button type="button" onClick={addPage}>
-                    ＋ 新增页面
-                  </button>
-                  <span className="divider" />
+                  </RibbonGroup>
                   <small className="muted">
                     {page ? '把文字、图片与素材放进故事' : '先选择一张页面，再添加内容'}
                   </small>
                 </>
               )}
+              {commandTab === '转场' && (
+                <>
+                  <RibbonGroup title="预览">
+                    <button
+                      type="button"
+                      disabled={!page}
+                      title="在阅读预览中观察实际转场"
+                      onClick={() => start(page?.id ?? null)}
+                    >
+                      预览当前页
+                    </button>
+                  </RibbonGroup>
+                  <RibbonGroup title="页面转场">
+                    {page ? (
+                      <>
+                        <label className="field ribbon-field">
+                          <span>效果</span>
+                          <select
+                            aria-label="页面转场效果"
+                            value={page.transition.type}
+                            onChange={(e) =>
+                              patchPage({
+                                transition: {
+                                  ...page.transition,
+                                  type: e.target.value as 'none' | 'fade',
+                                },
+                              })
+                            }
+                          >
+                            <option value="none">无</option>
+                            <option value="fade">交叉淡化</option>
+                          </select>
+                        </label>
+                        <span className="ribbon-placeholder">更多转场效果 · 后续填充</span>
+                      </>
+                    ) : (
+                      <small className="muted">先选择一张页面</small>
+                    )}
+                  </RibbonGroup>
+                  <RibbonGroup title="计时">
+                    {page ? (
+                      <Field
+                        label="时长（秒）"
+                        type="number"
+                        min={0.1}
+                        max={3}
+                        step={0.1}
+                        disabled={page.transition.type !== 'fade'}
+                        value={page.transition.duration}
+                        onChange={(duration) =>
+                          patchPage({ transition: { ...page.transition, duration } })
+                        }
+                      />
+                    ) : (
+                      <small className="muted">先选择一张页面</small>
+                    )}
+                  </RibbonGroup>
+                  <RibbonGroup title="换页方式">
+                    <span className="ribbon-placeholder">自动换页 · 后续填充</span>
+                  </RibbonGroup>
+                </>
+              )}
+              {commandTab === '动画' && (
+                <>
+                  <RibbonGroup title="预览">
+                    <button
+                      type="button"
+                      disabled={!page}
+                      title="在阅读预览中观察图层进场动画"
+                      onClick={() => start(page?.id ?? null)}
+                    >
+                      预览当前页
+                    </button>
+                  </RibbonGroup>
+                  <RibbonGroup title="对象动画">
+                    {layer ? (
+                      <>
+                        <label className="field ribbon-field">
+                          <span>动作</span>
+                          <select
+                            aria-label="图层动画动作"
+                            value={layer.effect.type}
+                            onChange={(e) =>
+                              patchLayer({
+                                effect: {
+                                  ...layer.effect,
+                                  type: e.target.value as 'none' | 'fade',
+                                },
+                              })
+                            }
+                          >
+                            <option value="none">无</option>
+                            <option value="fade">淡入</option>
+                          </select>
+                        </label>
+                        <span className="ribbon-placeholder">更多动画效果 · 后续填充</span>
+                      </>
+                    ) : (
+                      <small className="muted">请先选择图层</small>
+                    )}
+                  </RibbonGroup>
+                  <RibbonGroup title="计时">
+                    {layer ? (
+                      <Field
+                        label="时长（秒）"
+                        type="number"
+                        min={0.1}
+                        max={3}
+                        step={0.1}
+                        disabled={layer.effect.type !== 'fade'}
+                        value={layer.effect.duration}
+                        onChange={(duration) =>
+                          patchLayer({ effect: { ...layer.effect, duration } })
+                        }
+                      />
+                    ) : (
+                      <small className="muted">请先选择图层</small>
+                    )}
+                  </RibbonGroup>
+                  <RibbonGroup title="触发与排序">
+                    <span className="ribbon-placeholder">触发条件与图层排序 · 后续填充</span>
+                  </RibbonGroup>
+                </>
+              )}
               {commandTab === '视图' && (
                 <>
-                  <button type="button" disabled={mode === 'flow'} onClick={showFlow}>
-                    ◇ 流程编排
-                  </button>
-                  <button type="button" disabled={mode === 'page' || !page} onClick={showPage}>
-                    ▣ 页面编辑
-                  </button>
-                  <button type="button" disabled={mode !== 'flow'} onClick={fitFlow}>
-                    适应画布
-                  </button>
-                  <span className="divider" />
+                  <RibbonGroup title="工作区">
+                    <button type="button" disabled={mode === 'flow'} onClick={showFlow}>
+                      ◇ 流程编排
+                    </button>
+                    <button type="button" disabled={mode === 'page' || !page} onClick={showPage}>
+                      ▣ 页面编辑
+                    </button>
+                  </RibbonGroup>
+                  <RibbonGroup title="画布">
+                    <button type="button" disabled={mode !== 'flow'} onClick={fitFlow}>
+                      适应画布
+                    </button>
+                  </RibbonGroup>
                   <small className="muted">切换工作区与画布视图</small>
                 </>
               )}

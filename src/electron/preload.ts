@@ -21,6 +21,8 @@ ipcRenderer.on('flush-editor', async (_, requestId: string) => {
 });
 
 contextBridge.exposeInMainWorld('studio', {
+  // Read-only platform hint used for renderer-side window chrome decisions.
+  platform: process.platform,
   invoke: (action: string, payload?: unknown) => ipcRenderer.invoke('studio', action, payload),
   subscribe: (callback: (state: unknown) => void) => listen('state', callback),
   onLeaveRequest: (callback: (prompt: LeavePrompt) => void) => listen('leave-request', callback),

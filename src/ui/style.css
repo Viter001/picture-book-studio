@@ -1179,3 +1179,143 @@ button:disabled {
 .react-flow__edge.edge-selected .react-flow__edge-path {
   filter: drop-shadow(0 0 3px #c5d0c0);
 }
+
+/* Windows title bar: native caption buttons occupy the overlay's excluded area. */
+.window-titlebar {
+  flex: 0 0 auto;
+  height: env(titlebar-area-height, 32px);
+  width: env(titlebar-area-width, calc(100% - 138px));
+  margin-left: env(titlebar-area-x, 0px);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-app-region: drag;
+  user-select: none;
+  font-size: 12px;
+}
+.window-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.window-titlebar button,
+.window-titlebar a {
+  -webkit-app-region: no-drag;
+}
+.app > .player {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
+/* Purpose-based ribbon. Reserve space without pretending future tools are usable. */
+.command-ribbon {
+  display: block;
+  padding: 0;
+  min-height: 106px;
+  max-width: 100%;
+  overflow: hidden;
+}
+.command-tools {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0;
+  min-height: 106px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #526455 var(--panel);
+  padding: 6px 10px;
+}
+.ribbon-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  min-width: 125px;
+  max-width: 440px;
+  padding: 3px 16px 1px;
+  border-right: 1px solid var(--border);
+}
+.ribbon-group:last-child {
+  border-right: 0;
+}
+.ribbon-group-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 54px;
+}
+.ribbon-group-title {
+  padding-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 1px;
+}
+.ribbon-group .field {
+  min-width: 116px;
+  width: 130px;
+  margin-bottom: 0;
+  gap: 3px;
+}
+.ribbon-group .field > span {
+  font-size: 11px;
+}
+.ribbon-group input,
+.ribbon-group select {
+  padding: 5px 7px;
+}
+.ribbon-group button {
+  padding: 7px 10px;
+}
+.ribbon-group button.active,
+.ribbon-group button[aria-pressed='true'] {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: #202710;
+}
+.ribbon-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 12px;
+  min-height: 48px;
+  border: 1px dashed #425347;
+  color: var(--muted);
+  font-size: 12px;
+  background: #131a15;
+  cursor: default;
+}
+.ribbon-placeholder small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.ribbon-group .help {
+  max-width: 210px;
+  margin: 0;
+  font-size: 11px;
+}
+.command-tabs {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.command-tabs > .command-tab,
+.workspace-switch {
+  flex-shrink: 0;
+}
+@media (max-width: 1150px) {
+  .workspace-context {
+    display: none;
+  }
+  .ribbon-group {
+    padding-inline: 12px;
+  }
+}

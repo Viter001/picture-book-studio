@@ -12,6 +12,8 @@ export type State = {
 declare global {
   interface Window {
     studio: {
+      /** process.platform of the desktop host; read-only. */
+      platform: string;
       invoke: (
         action: string,
         payload?: unknown,

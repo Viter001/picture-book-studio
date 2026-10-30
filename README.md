@@ -1,6 +1,6 @@
 # 绘境 · 交互叙事工作台
 
-Electron + React + 自有作品模型的本地创作工具。当前为 **0.1.0 开发预览版**：可以制作、预览、保存互动绘本，外部 Agent 通过 MCP 协助编辑。生产界面已接入终端优先的深色主题、文件／开始／插入／视图命令分组、按前进／循环／后退着色的流程连线和同风格退出确认；作品画面本身不套用编辑器主题。
+Electron + React + 自有作品模型的本地创作工具。当前为 **0.1.0 开发预览版**：可以制作、预览、保存互动绘本，外部 Agent 通过 MCP 协助编辑。生产界面已接入终端优先的深色主题、Windows 原生按钮覆盖式标题栏、按用途划分的六类功能区和任务内转场／动画设置、按前进／循环／后退着色的流程连线，以及同风格退出确认；作品画面本身不套用编辑器主题。
 
 ## 直接试用
 
@@ -32,6 +32,7 @@ npm run package
 - `npm run build`：类型检查、React 生产构建、Electron 和 MCP bridge 构建。
 - `npm run test:electron`：真实 Electron 编辑与分支循环预览。工作区受低完整性标签影响时，可用 `STUDIO_EXECUTABLE=<普通目录中的 EXE>` 指向已解压副本。
 - `npm run test:edge-colors`：真实 Electron 检查前进／循环／后退三类连线颜色和图例。
+- `npm run test:ribbon-window`：真实 Electron 检查 Windows 标题栏、六类功能区、转场／动画设置与预览包裹布局。
 - `npm run test:integration`：六种媒体样本、MCP 协议、冲突、撤销及快照验证；同样支持 `STUDIO_EXECUTABLE`。
 - `npm run test:agent`：调用本机已登录的真实 Codex CLI，仅操作临时测试工程；会使用模型额度，不是普通单元测试。
 - `node scripts/ui-acceptance.mjs`、`playback-acceptance.mjs`、`flush-acceptance.mjs`：完整制作、音画生命周期/异常、未失焦输入保存回归。

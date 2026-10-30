@@ -446,6 +446,19 @@ else {
         minHeight: 700,
         title: '绘境 · 交互叙事工作台',
         backgroundColor: '#0d0f0e',
+        // Windows draws the native caption buttons as an overlay while the
+        // renderer supplies the rest of the title bar. Other platforms keep
+        // the system frame untouched.
+        ...(process.platform === 'win32'
+          ? {
+              titleBarStyle: 'hidden' as const,
+              titleBarOverlay: {
+                color: '#0d0f0e',
+                symbolColor: '#c5d0c0',
+                height: 32,
+              },
+            }
+          : {}),
         webPreferences: {
           preload: join(__dirname, 'preload.cjs'),
           sandbox: true,
