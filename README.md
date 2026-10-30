@@ -42,18 +42,17 @@ npm run package
 
 ## 状态与边界
 
-Windows x64 应用包已生成；功能证据、环境限制和未完成验收项见 [验收记录](docs/acceptance.md)。2026-10-29 已定位工作区低完整性标签造成的启动问题；同一程序部署到普通目录后，默认 GPU/沙箱的真实 Electron 编辑和分支预览回归通过。此前“需关闭沙箱才能自动化”的记录是受影响目录下的历史结果，不再作为交付方式。真实系统 DPI 与用户体验仍待人工验收。
+Windows x64 应用包已生成；功能证据、环境限制和未完成验收项见本地验收记录（不提交远程仓库）。2026-10-29 已定位工作区低完整性标签造成的启动问题；同一程序部署到普通目录后，默认 GPU/沙箱的真实 Electron 编辑和分支预览回归通过。此前“需关闭沙箱才能自动化”的记录是受影响目录下的历史结果，不再作为交付方式。真实系统 DPI 与用户体验仍待人工验收。
 
 本版不包含视频、隐藏数值/条件系统、云同步、作品独立网页或游戏发布。源码已推送到私有 GitHub 仓库 [Viter001/picture-book-studio](https://github.com/Viter001/picture-book-studio)；未上传安装包或创建公开 Release。
 
-## 项目文档
+## 项目文档与问题
 
 - [全局设计与发展规划](docs/product-roadmap.md)
 - [MVP 实施基线 v0.7](docs/product-plan-mvp.md)
-- [实施计划](docs/superpowers/plans/2026-10-28-mvp-first-run.md)
-- [项目约定](AGENTS.md)、[当前裁决与历史决定](QUESTIONS.md)、[反馈整改清单](FEEDBACK.md)
-- [阶段开发记录](DEVLOG.md)、[逐轮讨论与旧记录映射](DISCUSSION-LOG.md)
+- [外部 Agent 工具说明](docs/agent-tools.md)
+- [GitHub Issues](https://github.com/Viter001/picture-book-studio/issues)：同步当前待裁决、反馈和待办。
 
-当前未关闭事项以反馈清单为准。DSH 已提供接入步骤，尚无已安装或连接成功的实测记录；参见 [DSH 接入](docs/agent-tools.md#dsh)。
+项目协作约定、决策全文、反馈详情、开发/讨论记录、实施计划、验收证据和截图属于本地管理记录，已加入 `.gitignore`，不提交到 GitHub。当前未关闭事项以 GitHub Issues 为准。DSH 已提供接入步骤，尚无已安装或连接成功的实测记录；见 [DSH 接入](docs/agent-tools.md#dsh)。
 
 原绘本 `E:/code saving/INTERACTIVE-NARRATIVE-SYSTEM/` 只作参考，本次未修改。项目使用已安装的 project-change-delivery 技能，代码与记录通过私有 GitHub 仓库管理。

@@ -6,7 +6,7 @@ dist/
 build/
 coverage/
 *.log
-.agent/runs/
+.agent/
 .graphflow/
 .graphflow-cache/
 graphflow-out/
@@ -16,4 +16,12 @@ Thumbs.db
 dist-electron/
 release/
 
-.agent/tools/
+# Local-only project management records and evidence
+/AGENTS.md
+/QUESTIONS.md
+/FEEDBACK.md
+/DEVLOG.md
+/DISCUSSION-LOG.md
+/docs/acceptance.md
+/docs/superpowers/plans/
+/docs/screenshots/

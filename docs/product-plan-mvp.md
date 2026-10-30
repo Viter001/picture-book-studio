@@ -150,4 +150,4 @@ Electron 主进程管理工程及文件，preload 暴露有限操作；React 负
 
 其他具体行为按本稿默认方案实施，后续调整需同步记录。原词“登录登出”未被当作任何已批准机制。0.1.0 已进入开发预览，实施计划及实际验收单独维护。
 
-[全局设计](product-roadmap.md) · [工作区方向](product-roadmap.md#workspace) · [产物方向](product-roadmap.md#artifacts) · [决策记录](../QUESTIONS.md)
+[全局设计](product-roadmap.md) · [工作区方向](product-roadmap.md#workspace) · [产物方向](product-roadmap.md#artifacts) · 决策记录（本地）
